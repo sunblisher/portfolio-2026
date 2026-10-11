@@ -1,0 +1,25 @@
+# Result 002-harden-run-task
+
+- 작업 ID: 002-harden-run-task
+- 작업 상태: 완료
+- 구현 내용:
+  - `/run-task` 10단계(보고 및 승인 요청)를 "1단계 검사 → 보고 → 승인 → 2단계 검사 → 커밋·Push" 순서로 재구성
+  - "커밋 전 확인" 섹션을 "커밋 전 검사"로 바꾸고 승인 전/후 두 단계로 분리
+    - 1단계(승인 전, 스테이징 없음): `git status --short`, `git diff`, `git ls-files --others --exclude-standard`로 수정·신규 파일 식별, 새 파일은 내용 전체를 직접 확인
+    - 2단계(승인 후): 승인받은 경로만 `git add -- <path>`로 스테이징한 뒤 `git diff --cached --name-only`, `git diff --cached --check`, `git diff --cached`로 검사, 새 파일 내용 포함 여부 확인
+  - 민감정보·예상 밖 파일·`--check` 오류 발견 시 커밋·Push 중단, 스테이징 상태를 파괴적으로 초기화하지 않고 사용자에게 문의하도록 명시
+  - 검사 도구가 없으면 "도구 미설치, 수동 검토"로 정확히 기록하고, 도구 부재를 안전으로 단정하지 않도록 명시
+  - 사용자 승인, 경로 제한, 외부 전송 제한, 금지 작업 등 기존 안전 규칙은 변경 없이 유지
+- 수정 파일:
+  - .claude/skills/run-task/SKILL.md (수정)
+  - .ai-workflow/results/002-harden-run-task.md (추가)
+- 테스트 결과:
+  - YAML frontmatter 검사(Node 스크립트): 성공 — `name`, `description`, `argument-hint`, `disable-model-invocation` 정의 확인, `name` 형식 유효
+  - 코드 블록(```) 짝 검사: 성공
+  - 이전 섹션명("커밋 전 확인") 잔여 참조 검사: 없음
+  - lint/build: 미실행 (package.json 등 빌드 설정 없음)
+- 보안 검사 결과:
+  - 비밀정보 검사 도구(gitleaks, git-secrets): 도구 미설치, 수동 검토
+  - 정규식 검사(키·토큰·개인키·주민번호·전화번호·이메일 패턴) 및 수동 검토: 이상 없음
+- 미해결 문제:
+  - 없음
