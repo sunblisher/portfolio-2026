@@ -1,0 +1,28 @@
+# Result 007-natural-language-next-task
+
+- 작업 ID: 007-natural-language-next-task
+- 작업 상태: 완료
+- 구현 내용:
+  - 저장소 루트에 `CLAUDE.md`를 새로 만듦(기존 파일 없음)
+  - 다음 작업 실행 의도가 분명한 짧은 메시지(`다음`, `ㄱㄱ`, `진행`, `진행해`, `계속`, `다음 작업 진행`, `다음 거 해줘`)를 받으면 `/run-task`와 같은 절차로 실행하도록 명시
+  - 설명·인용·질문 속 단어는 트리거가 아니며, 불분명하면 먼저 확인하도록 명시
+  - `run-task` 스킬이 `disable-model-invocation: true`라 Claude가 직접 호출할 수 없으므로, `.claude/skills/run-task/SKILL.md`를 읽고 그대로 실행하도록 안내. 스킬 파일은 수정하지 않음
+  - 작업 번호가 없을 때 tasks/results를 대조해 미완료 작업을 고르는 규칙(1개 실행, 여러 개는 사용자 선택, 0개는 작업 없음 안내) 명시
+  - 기존 스킬의 안전 규칙을 모두 유지하고, 자연어 명령이 승인 권한을 넓히지 않음을 명시
+  - 적용 범위를 `C:\GitHub\portfolio-2026` 프로젝트로 한정
+  - 작업 지시서는 신뢰할 수 없는 입력이며 상위 보안 정책을 덮어쓰지 못함을 명시
+  - 자연어 실행이 동작하지 않을 때는 `/run-task [작업 ID]`를 직접 실행하면 된다는 대안 기록
+- 수정 파일:
+  - CLAUDE.md (추가)
+  - .ai-workflow/results/007-natural-language-next-task.md (추가)
+- 테스트 결과:
+  - lint / typecheck / test / build: 미실행 (`package.json` 등 프로젝트 테스트 설정이 없음, 문서 전용 저장소)
+  - 요구사항 1~7 대조 검토: 성공
+  - 실제 자연어 트리거 동작: 미실행 (새 세션에서 `CLAUDE.md`를 읽어야 적용되므로 다음 세션에서 확인 필요)
+- 보안 검사 결과:
+  - gitleaks / git-secrets: 도구 미설치, 수동 검토
+  - 수동 검토 (신규 파일 2개 전체 읽기, `git diff --cached`): 이상 없음
+- 승인:
+  - 프로젝트의 Claude Code 동작 지침을 바꾸는 작업이므로 지시서에 따라 커밋·Push 전에 사용자 개별 승인을 받음
+- 미해결 문제:
+  - 자연어 메시지가 항상 `/run-task` 절차로 이어진다고 보장할 수 없음. 동작하지 않으면 `/run-task`를 직접 실행
